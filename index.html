@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>覃钰淇爱杨嘉伟 - 爱心表白</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ffc0cb;
+            margin: 20px 0;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(255, 192, 203, 0.7);
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: #ffc0cb;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 840px;
+            height: 680px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+        }
+
+        canvas {
+            display: block;
+            background-color: #000;
+        }
+
+        .controls {
+            margin: 25px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 50px;
+        }
+
+        .color-label {
+            color: #ffc0cb;
+            font-weight: bold;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .color-option.active {
+            border-color: white;
+            transform: scale(1.1);
+        }
+
+        .footer {
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.9rem;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .heart-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #ffc0cb;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 192, 203, 0.7);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .speed-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ffc0cb;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 192, 203, 0.7);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .beat-counter {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            color: #ffc0cb;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 192, 203, 0.7);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 860px) {
+            .canvas-container {
+                width: 95vw;
+                height: calc(95vw * 0.81);
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .heart-counter, .speed-display, .beat-counter {
+                position: relative;
+                top: auto;
+                left: auto;
+                right: auto;
+                display: inline-block;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>❤️ 覃钰淇爱杨嘉伟 ❤️</h1>
+        <p class="subtitle">这颗心为你每秒跳动5次</p>
+
+        <div class="canvas-container">
+            <canvas id="heartCanvas"></canvas>
+            <div class="heart-counter">
+                爱心粒子数: <span id="particleCount">0</span>
+            </div>
+            <div class="speed-display">
+                速度: <span id="speedDisplay">快速</span>
+            </div>
+            <div class="beat-counter">
+                心跳: <span id="beatCount">0</span> 次/秒
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="pauseBtn">暂停动画</button>
+            <button id="speedUpBtn">加快心跳</button>
+            <button id="speedDownBtn">减慢心跳</button>
+            <button id="normalSpeedBtn">设定5次/秒</button>
+            <button id="addHeartsBtn">添加爱心粒子</button>
+
+            <div class="color-picker">
+                <span class="color-label">爱心颜色:</span>
+                <div class="color-option active" style="background-color: #ffc0cb;" data-color="#ffc0cb"></div>
+                <div class="color-option" style="background-color: #ff69b4;" data-color="#ff69b4"></div>
+                <div class="color-option" style="background-color: #ff1493;" data-color="#ff1493"></div>
+                <div class="color-option" style="background-color: #ff6b9d;" data-color="#ff6b9d"></div>
+                <div class="color-option" style="background-color: #ff9999;" data-color="#ff9999"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            基于Python爱心表白代码转换的HTML5 Canvas实现 | 愿天下有情人终成眷属
+        </div>
+    </div>
+
+    <script>
+        // 常量定义
+        const CANVAS_WIDTH = 840;
+        const CANVAS_HEIGHT = 680;
+        const CANVAS_CENTER_X = CANVAS_WIDTH / 2;
+        const CANVAS_CENTER_Y = CANVAS_HEIGHT / 2;
+        const IMAGE_ENLARGE = 11;
+        const TEXT = "覃钰淇爱杨嘉伟";
+
+        // 初始颜色
+        let HEART_COLOR = "#ffc0cb";
+
+        // 获取Canvas上下文
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
+
+        // 动画控制变量
+        let animationId = null;
+        let isPaused = false;
+        let currentFrame = 0;
+        let speedFactor = 2.5; // 大幅提高速度因子以实现5次/秒
+        let particleCount = 0;
+        let lastTime = 0;
+        let beatCount = 0;
+        let beatStartTime = 0;
+        let beatPerSecond = 0;
+        const frameInterval = 1000 / 60; // 60 FPS以获得更流畅的快速动画
+        const TARGET_BEATS_PER_SECOND = 5; // 目标心跳次数：5次/秒
+
+        // 心跳计数器
+        function updateBeatCounter() {
+            const now = Date.now();
+            if (beatStartTime === 0) {
+                beatStartTime = now;
+            }
+
+            // 每5秒重置一次心跳计数
+            if (now - beatStartTime > 5000) {
+                beatPerSecond = beatCount / 5;
+                beatCount = 0;
+                beatStartTime = now;
+            }
+
+            document.getElementById('beatCount').textContent = beatPerSecond.toFixed(1);
+        }
+
+        // 修改曲线函数，让跳动更快但保持可见
+        function curve(p) {
+            // 使用更高频率的正弦函数，实现更快跳动
+            return 1.2 * Math.sin(10 * p) / Math.PI; // 增加频率和振幅
+        }
+
+        // 爱心函数 - 增加跳动幅度
+        function heartFunction(t, shrinkRatio = IMAGE_ENLARGE) {
+            const x = 17 * (Math.sin(t) ** 3);
+            // 修改公式以增加跳动幅度
+            const y = -(16 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+            const scaledX = x * shrinkRatio + CANVAS_CENTER_X;
+            const scaledY = y * shrinkRatio + CANVAS_CENTER_Y;
+            return { x: scaledX, y: scaledY };
+        }
+
+        // 内部扩散点 - 增加扩散系数以获得更动态的效果
+        function scatterInside(x, y, beta = 0.15) {
+            const ratioX = -beta * Math.log(Math.random());
+            const ratioY = -beta * Math.log(Math.random());
+            const dx = ratioX * (x - CANVAS_CENTER_X);
+            const dy = ratioY * (y - CANVAS_CENTER_Y);
+            return { x: x - dx, y: y - dy };
+        }
+
+        // 收缩函数 - 增加收缩力度
+        function shrink(x, y, ratio) {
+            const force = -0.8 / (((x - CANVAS_CENTER_X) ** 2 + (y - CANVAS_CENTER_Y) ** 2) ** 0.6);
+            const dx = ratio * force * (x - CANVAS_CENTER_X);
+            const dy = ratio * force * (y - CANVAS_CENTER_Y);
+            return { x: x - dx, y: y - dy };
+        }
+
+        // 爱心类 - 优化以实现更快的跳动
+        class Heart {
+            constructor(generateFrame = 24) { // 减少帧数以实现更快循环（24帧在2.5倍速下≈5次/秒）
+                this.points = new Set();
+                this.edgeDiffusionPoints = new Set();
+                this.centerDiffusionPoints = new Set();
+                this.allPoints = {};
+                this.generateFrame = generateFrame;
+                this.build(1800); // 适当增加基础点数
+
+                for (let frame = 0; frame < generateFrame; frame++) {
+                    this.calc(frame);
+                }
+            }
+
+            build(number) {
+                // 创建基础爱心点
+                for (let i = 0; i < number; i++) {
+                    const t = Math.random() * 2 * Math.PI;
+                    const { x, y } = heartFunction(t);
+                    this.points.add(`${x},${y}`);
+                }
+
+                // 边缘扩散点 - 增加扩散以获得更动态效果
+                const pointArray = Array.from(this.points);
+                for (const pointStr of pointArray) {
+                    const [xStr, yStr] = pointStr.split(',');
+                    let x = parseFloat(xStr);
+                    let y = parseFloat(yStr);
+
+                    // 增加扩散次数
+                    for (let i = 0; i < 2; i++) {
+                        const scattered = scatterInside(x, y, 0.05);
+                        x = scattered.x;
+                        y = scattered.y;
+                        this.edgeDiffusionPoints.add(`${x},${y}`);
+                    }
+                }
+
+                // 中心扩散点 - 增加数量
+                for (let i = 0; i < 8000; i++) {
+                    const randomPoint = pointArray[Math.floor(Math.random() * pointArray.length)];
+                    const [xStr, yStr] = randomPoint.split(',');
+                    let x = parseFloat(xStr);
+                    let y = parseFloat(yStr);
+
+                    const scattered = scatterInside(x, y, 0.25);
+                    this.centerDiffusionPoints.add(`${scattered.x},${scattered.y}`);
+                }
+            }
+
+            calcPosition(x, y, ratio) {
+                // 增加位置计算的影响以获得更明显的跳动
+                const force = 0.8 / (((x - CANVAS_CENTER_X) ** 2 + (y - CANVAS_CENTER_Y) ** 2) ** 0.420);
+                const dx = ratio * force * (x - CANVAS_CENTER_X) + (Math.random() * 2 - 1);
+                const dy = ratio * force * (y - CANVAS_CENTER_Y) + (Math.random() * 2 - 1);
+                return { x: x - dx, y: y - dy };
+            }
+
+            calc(generateFrame) {
+                // 增加跳动幅度
+                const ratio = 15 * curve(generateFrame / 6 * Math.PI); // 减小分母以增加频率
+                const haloRadius = 4 + 6 * (1 + curve(generateFrame / 6 * Math.PI));
+                const haloNumber = 3000 + 5000 * Math.abs(curve(generateFrame / 6 * Math.PI) ** 2);
+                const allPoints = [];
+
+                // 光晕点 - 增加数量和范围
+                const heartHaloPoint = new Set();
+                for (let i = 0; i < haloNumber; i++) {
+                    const t = Math.random() * 2 * Math.PI;
+                    let { x, y } = heartFunction(t, 14);
+                    const shrunk = shrink(x, y, haloRadius);
+                    x = shrunk.x;
+                    y = shrunk.y;
+
+                    const pointKey = `${x},${y}`;
+                    if (!heartHaloPoint.has(pointKey)) {
+                        heartHaloPoint.add(pointKey);
+                        x += Math.random() * 60 - 30;
+                        y += Math.random() * 60 - 30;
+                        const size = Math.random() > 0.6 ? 1 : 2;
+
+                        allPoints.push({ x, y, size });
+                        // 增加额外点的数量以获得更丰富的效果
+                        if (Math.random() > 0.3) {
+                            allPoints.push({ x: x + 15, y: y + 15, size });
+                        }
+                        if (Math.random() > 0.3) {
+                            allPoints.push({ x: x - 15, y: y - 15, size });
+                        }
+                        if (Math.random() > 0.5) {
+                            allPoints.push({ x: x + 15, y: y - 15, size });
+                        }
+                        if (Math.random() > 0.5) {
+                            allPoints.push({ x: x - 15, y: y + 15, size });
+                        }
+                    }
+                }
+
+                // 基础爱心点
+                for (const pointStr of this.points) {
+                    const [xStr, yStr] = pointStr.split(',');
+                    let x = parseFloat(xStr);
+                    let y = parseFloat(yStr);
+
+                    const pos = this.calcPosition(x, y, ratio);
+                    const size = Math.floor(Math.random() * 2.5) + 1;
+                    allPoints.push({ x: pos.x, y: pos.y, size });
+                }
+
+                // 边缘扩散点
+                for (const pointStr of this.edgeDiffusionPoints) {
+                    const [xStr, yStr] = pointStr.split(',');
+                    let x = parseFloat(xStr);
+                    let y = parseFloat(yStr);
+
+                    const pos = this.calcPosition(x, y, ratio);
+                    const size = Math.floor(Math.random() * 2) + 1;
+                    allPoints.push({ x: pos.x, y: pos.y, size });
+                }
+
+                // 中心扩散点
+                for (const pointStr of this.centerDiffusionPoints) {
+                    const [xStr, yStr] = pointStr.split(',');
+                    let x = parseFloat(xStr);
+                    let y = parseFloat(yStr);
+
+                    const pos = this.calcPosition(x, y, ratio);
+                    const size = Math.floor(Math.random() * 2) + 1;
+                    allPoints.push({ x: pos.x, y: pos.y, size });
+                }
+
+                this.allPoints[generateFrame] = allPoints;
+                return allPoints.length;
+            }
+
+            render(renderFrame) {
+                const points = this.allPoints[renderFrame % this.generateFrame];
+                if (!points) return;
+
+                // 完全清空画布，避免拖尾效果（这样跳动更清晰）
+                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+                // 绘制所有粒子点
+                for (const point of points) {
+                    // 为粒子添加轻微的光晕效果
+                    ctx.shadowColor = HEART_COLOR;
+                    ctx.shadowBlur = 3;
+                    ctx.fillStyle = HEART_COLOR;
+                    ctx.fillRect(point.x, point.y, point.size, point.size);
+                }
+
+                // 重置阴影
+                ctx.shadowBlur = 0;
+
+                // 绘制中心文字
+                ctx.font = "bold 28px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "#ffb6c1";
+                ctx.shadowColor = "rgba(255, 192, 203, 0.8)";
+                ctx.shadowBlur = 10;
+                ctx.fillText(TEXT, CANVAS_CENTER_X, CANVAS_CENTER_Y);
+                ctx.shadowBlur = 0;
+
+                // 更新粒子计数
+                particleCount = points.length;
+                document.getElementById('particleCount').textContent = particleCount.toLocaleString();
+
+                // 检测心跳（每完成一个循环计为一次心跳）
+                if (renderFrame % this.generateFrame === 0) {
+                    beatCount++;
+                    updateBeatCounter();
+                }
+            }
+        }
+
+        // 创建爱心实例
+        const heart = new Heart(24); // 24帧循环
+
+        // 计算目标速度因子以实现5次/秒
+        function calculateSpeedForBeats(beatsPerSecond) {
+            // 公式：speedFactor = (beatsPerSecond * generateFrame) / (60 / frameInterval)
+            return (beatsPerSecond * heart.generateFrame) / (60 / (1000 / frameInterval));
+        }
+
+        // 更新速度显示
+        function updateSpeedDisplay() {
+            let speedText = "很慢";
+            if (speedFactor < 1.0) speedText = "较慢";
+            else if (speedFactor < 2.0) speedText = "正常";
+            else if (speedFactor < 3.0) speedText = "快速";
+            else if (speedFactor < 4.0) speedText = "很快";
+            else speedText = "极快";
+
+            document.getElementById('speedDisplay').textContent = speedText;
+        }
+
+        // 动画循环
+        function animate(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+
+            const elapsed = timestamp - lastTime;
+
+            if (elapsed > frameInterval && !isPaused) {
+                lastTime = timestamp - (elapsed % frameInterval);
+
+                heart.render(Math.floor(currentFrame));
+                currentFrame += speedFactor;
+
+                // 防止currentFrame过大
+                if (currentFrame > 10000) currentFrame = 0;
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // 初始化
+        function init() {
+            // 设置初始速度为5次/秒
+            speedFactor = calculateSpeedForBeats(TARGET_BEATS_PER_SECOND);
+
+            // 更新初始速度显示
+            updateSpeedDisplay();
+
+            // 开始动画
+            animate(0);
+
+            // 控制按钮事件
+            document.getElementById('pauseBtn').addEventListener('click', function() {
+                isPaused = !isPaused;
+                this.textContent = isPaused ? '继续动画' : '暂停动画';
+            });
+
+            document.getElementById('speedUpBtn').addEventListener('click', function() {
+                speedFactor = Math.min(speedFactor + 0.3, 5.0);
+                updateSpeedDisplay();
+            });
+
+            document.getElementById('speedDownBtn').addEventListener('click', function() {
+                speedFactor = Math.max(speedFactor - 0.3, 0.5);
+                updateSpeedDisplay();
+            });
+
+            document.getElementById('normalSpeedBtn').addEventListener('click', function() {
+                speedFactor = calculateSpeedForBeats(TARGET_BEATS_PER_SECOND);
+                updateSpeedDisplay();
+            });
+
+            document.getElementById('addHeartsBtn').addEventListener('click', function() {
+                // 添加更多粒子
+                for (let frame = 0; frame < heart.generateFrame; frame++) {
+                    const additionalPoints = [];
+                    for (let i = 0; i < 80; i++) {
+                        const t = Math.random() * 2 * Math.PI;
+                        const { x, y } = heartFunction(t, IMAGE_ENLARGE);
+                        const size = Math.floor(Math.random() * 2) + 1;
+                        additionalPoints.push({ x, y, size });
+                    }
+                    if (heart.allPoints[frame]) {
+                        heart.allPoints[frame] = heart.allPoints[frame].concat(additionalPoints);
+                    }
+                }
+            });
+
+            // 颜色选择器
+            const colorOptions = document.querySelectorAll('.color-option');
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    HEART_COLOR = this.getAttribute('data-color');
+                });
+            });
+
+            // 添加点击画布添加爱心的功能
+            canvas.addEventListener('click', function(event) {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+
+                // 在点击位置添加小爱心粒子
+                for (let i = 0; i < 40; i++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const radius = Math.random() * 25;
+                    const pointX = x + Math.cos(angle) * radius;
+                    const pointY = y + Math.sin(angle) * radius;
+                    const size = Math.random() * 2 + 0.5;
+
+                    // 添加到当前帧的所有帧中
+                    for (let frame = 0; frame < heart.generateFrame; frame++) {
+                        if (heart.allPoints[frame]) {
+                            heart.allPoints[frame].push({ x: pointX, y: pointY, size });
+                        }
+                    }
+                }
+            });
+
+            // 初始粒子计数
+            if (heart.allPoints[0]) {
+                document.getElementById('particleCount').textContent = heart.allPoints[0].length.toLocaleString();
+            }
+
+            // 初始心跳计数
+            updateBeatCounter();
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
+
+        // 页面卸载时清理动画
+        window.addEventListener('beforeunload', () => {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+    </script>
+</body>
+</html>
